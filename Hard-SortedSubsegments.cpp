@@ -9,6 +9,7 @@ using namespace std;
 
 #define RANGE 1000000000
 #define ROOT 1
+//#define STEPS 10000000
 
 typedef struct query {
     int l, r;
@@ -35,36 +36,63 @@ void init(vector <seg> &tree, int root, int l, int r, vector <int> &values, int 
 }
 
 void fill(vector <seg> &tree, int root, int value) {
+//    static int counter = 0;
+//    counter++;
+//    if (counter % STEPS == 0) printf("function fill counter: %d\n", counter / STEPS);
+
     tree[root].count = value * (tree[root].r - tree[root].l + 1);
     tree[root].filled_value = value;
     tree[root].filled = true;
 }
 
 void pass(vector <seg> &tree, int root) {
-//    if (tree[root].l == tree[root].r || !tree[root].filled ) return;
+//    static int counter = 0;
+//    counter++;
+//    if (counter % STEPS == 0) printf("function pass counter: %d\n", counter / STEPS);
+
     fill(tree, root * 2, tree[root].filled_value);
     fill(tree, root * 2 + 1, tree[root].filled_value);
     tree[root].filled = false;
 }
 
 int calc(vector <seg> &tree, int root, int l, int r) {
+//    static int counter = 0;
+//    counter++;
+//    if (counter % STEPS == 0) printf("function calc counter: %d\n", counter / STEPS);
+
     if (l <= tree[root].l && tree[root].r <= r) return tree[root].count;
     if (r < tree[root].l || tree[root].r < l) return 0;
-//    int m = (tree[root].l + tree[root].r) / 2;
-    if (tree[root].filled) pass(tree, root);
-    return calc(tree, root * 2, l, r) + calc(tree, root * 2 + 1, l, r);
+    if (tree[root].filled) {
+        return tree[root].filled_value * (min(r, tree[root].r) - max(l, tree[root].l) + 1);
+    } else {
+        return calc(tree, root * 2, l, r) + calc(tree, root * 2 + 1, l, r);
+    }
 }
 
 void set(vector <seg> &tree, int root, int l, int r, int value) {
+//    static int counter = 0;
+//    counter++;
+//    if (counter % STEPS == 0) printf("function set counter: %d\n", counter / STEPS);
+
     if (l <= tree[root].l && tree[root].r <= r) {
         fill(tree, root, value);
         return;
     }
     if (r < tree[root].l || tree[root].r < l) return;
-    if (tree[root].filled) pass(tree, root);
+    if (tree[root].filled) {
+        if (tree[root].filled_value == value) return;
+        pass(tree, root);
+    }
     set(tree, root * 2, l, r, value);
     set(tree, root * 2 + 1, l, r, value);
     tree[root].count = tree[root * 2].count + tree[root * 2 + 1].count;
+    for (int filled_value = 0; filled_value < 2; filled_value ++) {
+        if (tree[root].count == filled_value * (tree[root].r - tree[root].l + 1)) {
+            tree[root].filled_value = filled_value;
+            tree[root].filled = true;
+            break;
+        }
+    }
     return;
 }
 
