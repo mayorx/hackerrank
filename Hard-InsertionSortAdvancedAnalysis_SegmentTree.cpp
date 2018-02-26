@@ -1,5 +1,5 @@
 /*
-70% TLE
+TLE on 3 cases
 */
 #include <cstdio>
 #include <map>
