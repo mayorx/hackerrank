@@ -1,3 +1,6 @@
+/*
+100% cases
+*/
 #include <cstdio>
 #include <vector>
 #include <algorithm>
