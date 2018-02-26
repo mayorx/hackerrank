@@ -1,9 +1,10 @@
 /*
-TLE on 3 cases
+100% cases
 */
 #include <cstdio>
-#include <map>
+//#include <map>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -15,15 +16,36 @@ typedef struct node {
     int l, r, count;
 } node;
 
+
+typedef struct rec {
+    int value, ith;
+} rec;
+
+bool cmp(rec a, rec b) {
+    return a.value < b.value;
+}
+
 void discrete(vector <int> &a) {
-    map <int, int> m;
-    for (int i = 0; i < a.size(); i++) m[a[i]] = 1;
-    int cnt = 0;
-    for (map<int, int>::iterator it = m.begin(); it != m.end(); it++) {
-        cnt++;
-        it->second = cnt;
-    }
-    for (int i = 0; i < a.size(); i++) a[i] = m[a[i]];
+        vector <rec> help(a.size());
+        for (int i = 0; i < a.size(); i++) {
+            help[i].value = a[i];
+            help[i].ith = i;
+        }
+        sort(help.begin(), help.end(), cmp);
+
+        int cnt = 0;
+        for (int i = 0; i < help.size(); i++) {
+            if (i == 0 || help[i-1].value != help[i].value) cnt++;
+            a[help[i].ith] = cnt;
+        }
+//    map <int, int> m;
+//    for (int i = 0; i < a.size(); i++) m[a[i]] = 1;
+//    int cnt = 0;
+//    for (map<int, int>::iterator it = m.begin(); it != m.end(); it++) {
+//        cnt++;
+//        it->second = cnt;
+//    }
+//    for (int i = 0; i < a.size(); i++) a[i] = m[a[i]];
 }
 
 void init(vector <node> &tree, int root, int l, int r) {
